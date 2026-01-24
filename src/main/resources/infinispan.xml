@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<infinispan
+    xmlns="urn:infinispan:config:15.0">
+
+    <cache-container statistics="true">
+        <!-- ===== ENTITIES ===== -->
+        <local-cache name="album">
+            <memory max-count="5000"/>
+            <expiration lifespan="600000"/>
+            <statistics enabled="true"/>
+        </local-cache>
+        <local-cache name="music_band">
+            <memory max-count="10000"/>
+            <expiration lifespan="600000"/>
+            <statistics enabled="true"/>
+        </local-cache>
+        <local-cache name="studio">
+            <memory max-count="2000"/>
+            <expiration lifespan="1800000"/>
+            <statistics enabled="true"/>
+        </local-cache>
+        <local-cache name="coordinates">
+            <memory max-count="2000"/>
+            <expiration lifespan="1800000"/>
+            <statistics enabled="true"/>
+        </local-cache>
+        <local-cache name="nomination">
+            <memory max-count="5000"/>
+            <expiration lifespan="600000"/>
+            <statistics enabled="true"/>
+        </local-cache>
+
+        <!-- ===== COLLECTIONS ===== -->
+        <local-cache name="album.musicBands">
+            <memory max-count="5000"/>
+            <statistics enabled="true"/>
+        </local-cache>
+        <local-cache name="studio.musicBands">
+            <memory max-count="5000"/>
+            <statistics enabled="true"/>
+        </local-cache>
+        <local-cache name="coordinates.musicBands">
+            <memory max-count="5000"/>
+            <statistics enabled="true"/>
+        </local-cache>
+    </cache-container>
+</infinispan>

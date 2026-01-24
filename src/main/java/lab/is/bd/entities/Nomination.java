@@ -2,9 +2,12 @@ package lab.is.bd.entities;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
@@ -33,6 +36,8 @@ import lombok.ToString;
 
 @Entity
 @Table(name = "nominations")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "nomination")
 @Getter
 @Setter
 @NoArgsConstructor

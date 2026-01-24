@@ -3,6 +3,10 @@ package lab.is.bd.entities;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import jakarta.persistence.Cacheable;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
@@ -38,6 +42,8 @@ import lombok.ToString;
     name = "music_bands",
     indexes = @Index(name = "idx_music_band_name", columnList = "name", unique = false)
 )
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "music_band")
 @Getter
 @Setter
 @NoArgsConstructor

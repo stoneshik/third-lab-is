@@ -8,7 +8,7 @@ import lab.is.bd.entities.MusicGenre;
 import lab.is.repositories.specifications.MySpecification;
 
 @Component
-public final class MusicBandSpecifications extends MySpecification<MusicBand> {
+public class MusicBandSpecifications extends MySpecification<MusicBand> {
     public Specification<MusicBand> nameLike(String fieldValue) {
         return fieldStringValueLike(
             MusicBandFieldNames.NAME,

@@ -3,6 +3,10 @@ package lab.is.bd.entities;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -24,6 +28,8 @@ import lombok.ToString;
 
 @Entity
 @Table(name = "coordinates")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "coordinates")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -58,6 +64,10 @@ public class Coordinates {
         fetch = FetchType.LAZY,
         cascade = {},
         orphanRemoval = false
+    )
+    @Cache(
+        usage = CacheConcurrencyStrategy.READ_WRITE,
+        region = "coordinates.musicBands"
     )
     private Set<MusicBand> musicBands = new HashSet<>();
 

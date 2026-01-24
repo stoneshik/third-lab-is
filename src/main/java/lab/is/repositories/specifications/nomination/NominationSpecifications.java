@@ -11,7 +11,7 @@ import lab.is.repositories.specifications.MySpecification;
 import lab.is.repositories.specifications.musicband.MusicBandFieldNames;
 
 @Component
-public final class NominationSpecifications extends MySpecification<Nomination> {
+public class NominationSpecifications extends MySpecification<Nomination> {
     public Specification<Nomination> musicBandIdEquals(Long musicBandId) {
         return fieldValueFromEntityEquals(
             NominationFieldNames.MUSIC_BAND,

@@ -3,6 +3,10 @@ package lab.is.bd.entities;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -25,6 +29,8 @@ import lombok.ToString;
 
 @Entity
 @Table(name = "albums")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "album")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -60,6 +66,10 @@ public class Album {
         fetch = FetchType.LAZY,
         cascade = {},
         orphanRemoval = false
+    )
+    @Cache(
+        usage = CacheConcurrencyStrategy.READ_WRITE,
+        region = "album.musicBands"
     )
     private Set<MusicBand> musicBands = new HashSet<>();
 
