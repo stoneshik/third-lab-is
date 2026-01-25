@@ -14,6 +14,7 @@ import lab.is.bd.entities.InsertionHistory;
 import lab.is.bd.entities.InsertionHistoryStatus;
 import lab.is.dto.responses.insertion.history.InsertionHistoryResponseDto;
 import lab.is.dto.responses.insertion.history.WrapperListInsertionHistoriesResponseDto;
+import lab.is.exceptions.UserDoesNotHaveEnoughRightsException;
 import lab.is.repositories.InsertionHistoryRepository;
 import lab.is.security.bd.entities.User;
 import lab.is.security.services.UserService;
@@ -124,8 +125,12 @@ public class InsertionHistoryService {
     }
 
     @Transactional
-    public DownloadFile download(Long insertionHistoryId) {
+    public DownloadFile download(Long insertionHistoryId, Long userIdFromRequest) {
         InsertionHistory insertionHistory = insertionHistoryTxService.findById(insertionHistoryId);
+        Long userId = insertionHistory.getUser().getId();
+        if (userId != null && !userId.equals(userIdFromRequest)) {
+            throw new UserDoesNotHaveEnoughRightsException("у пользователя недостаточно прав");
+        }
         String filename = insertionHistory.getFileObjectKey()
             .substring(insertionHistory.getFileObjectKey().lastIndexOf('/') + 1);
         return DownloadFile.builder()

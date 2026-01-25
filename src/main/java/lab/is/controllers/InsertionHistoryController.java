@@ -56,8 +56,27 @@ public class InsertionHistoryController {
     }
 
     @GetMapping("/{insertionHistoryId}/file")
-    public ResponseEntity<Resource> download(@PathVariable long insertionHistoryId) {
-        DownloadFile downloadFile = insertionHistoryService.download(insertionHistoryId);
+    public ResponseEntity<Resource> downloadWrapper(
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
+        @RequestParam(required = false) Long userId,
+        @PathVariable Long insertionHistoryId
+    ) {
+        if (userId == null &&
+                userDetails.getAuthorities().contains(new SimpleGrantedAuthority(RoleEnum.ROLE_ADMIN.name()))) {
+            return download(insertionHistoryId, null);
+        }
+        if (userId == null) {
+            throw new UserDoesNotHaveEnoughRightsException("у пользователя недостаточно прав");
+        }
+        Long userIdFromUserDetails = userDetails.getId();
+        if (!userId.equals(userIdFromUserDetails)) {
+            throw new UserDoesNotHaveEnoughRightsException("у пользователя недостаточно прав");
+        }
+        return download(insertionHistoryId, userId);
+    }
+
+    public ResponseEntity<Resource> download(Long insertionHistoryId, Long userId) {
+        DownloadFile downloadFile = insertionHistoryService.download(insertionHistoryId, userId);
         return ResponseEntity.ok()
             .header(
                 HttpHeaders.CONTENT_DISPOSITION,
