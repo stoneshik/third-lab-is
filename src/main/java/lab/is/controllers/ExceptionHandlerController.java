@@ -24,11 +24,11 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import lab.is.config.BatchProperties;
 import lab.is.dto.responses.ErrorMessageResponseDto;
 import lab.is.exceptions.CsvParserException;
 import lab.is.exceptions.DuplicateNameException;
 import lab.is.exceptions.IncorrectDtoInRequestException;
+import lab.is.exceptions.MinioException;
 import lab.is.exceptions.MusicBandExistsException;
 import lab.is.exceptions.NestedObjectIsUsedException;
 import lab.is.exceptions.NestedObjectNotFoundException;
@@ -37,19 +37,11 @@ import lab.is.exceptions.ResourceIsAlreadyExistsException;
 import lab.is.exceptions.RetryInsertException;
 import lab.is.exceptions.TokenRefreshException;
 import lab.is.exceptions.ValueOverflowException;
-import lab.is.services.insertion.bloomfilter.BloomFilterManager;
-import lab.is.services.insertion.history.InsertionHistoryService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @RestControllerAdvice
 @RequiredArgsConstructor
 public class ExceptionHandlerController {
-    private final BatchProperties properties;
-    private final InsertionHistoryService insertionHistoryService;
-    private final BloomFilterManager bloomFilterManager;
-
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
     public ErrorMessageResponseDto handleException(NotFoundException e) {
@@ -126,14 +118,6 @@ public class ExceptionHandlerController {
     @ExceptionHandler(CsvParserException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public ErrorMessageResponseDto handleException(CsvParserException e) {
-        try {
-            insertionHistoryService.updateStatusToFailed(e.getInsertionHistoryId());
-        } catch (Exception updateHistoryException) {
-            log.warn("не получилось обновить статус истории вставки на failed");
-        }
-        if (e.getRecordCount() >= properties.getMaxRecordNumberForRebuildBloomFilter()) {
-            bloomFilterManager.rebuild();
-        }
         return ErrorMessageResponseDto.builder()
             .timestamp(new Date())
             .message(e.getMessage())
@@ -236,6 +220,15 @@ public class ExceptionHandlerController {
             .timestamp(new Date())
             .message("Переданы неправильные значения")
             .violations(errors)
+            .build();
+    }
+
+    @ExceptionHandler(MinioException.class)
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorMessageResponseDto handleException(MinioException e) {
+        return ErrorMessageResponseDto.builder()
+            .timestamp(new Date())
+            .message(e.getMessage())
             .build();
     }
 

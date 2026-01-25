@@ -19,4 +19,6 @@ public class InsertionHistoryResponseDto {
     private InsertionHistoryStatus status;
     private String login;
     private Long numberObjects;
+    private String fileObjectKey;
+    private Boolean fileCommitted;
 }

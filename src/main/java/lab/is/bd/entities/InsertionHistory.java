@@ -84,6 +84,14 @@ public class InsertionHistory {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
+    @ToString.Include
+    @Column(name = "file_object_key", nullable = true)
+    private String fileObjectKey;
+
+    @ToString.Include
+    @Column(name = "file_committed", nullable = false)
+    private Boolean fileCommitted;
+
     @PrePersist
     protected void onCreate() {
         this.creationDate = LocalDateTime.now();

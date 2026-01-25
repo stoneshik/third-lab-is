@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import lab.is.bd.entities.InsertionHistory;
@@ -31,17 +32,39 @@ public class InsertionHistoryService {
         return insertionHistoryTxService.findById(id);
     }
 
+    @Transactional
+    public void attachFile(Long insertionHistoryId, String objectKey) {
+        InsertionHistory insertionHistory = insertionHistoryTxService.findById(insertionHistoryId);
+        InsertionHistory updated = insertionHistory.toBuilder()
+            .fileObjectKey(objectKey)
+            .fileCommitted(false)
+            .build();
+        insertionHistoryRepository.save(updated);
+        insertionHistoryRepository.flush();
+    }
+
+    @Transactional
+    public void markFileCommittedAndStatusToSuccess(Long insertionHistoryId, Long numberObjects) {
+        InsertionHistory insertionHistory = insertionHistoryTxService.findById(insertionHistoryId);
+        InsertionHistory updated = insertionHistory.toBuilder()
+            .endDate(LocalDateTime.now())
+            .status(InsertionHistoryStatus.SUCCESS)
+            .numberObjects(numberObjects)
+            .fileCommitted(true)
+            .build();
+        insertionHistoryRepository.save(updated);
+        insertionHistoryRepository.flush();
+    }
+
     @Transactional(readOnly = true)
     public WrapperListInsertionHistoriesResponseDto findAll(Pageable pageable) {
         Page<InsertionHistory> page = insertionHistoryRepository.findAll(pageable);
         List<InsertionHistoryResponseDto> insertionHistoryResponseDtos = new ArrayList<>();
-
         page.forEach(insertionHistory ->
             insertionHistoryResponseDtos.add(
                 InsertionHistoryMapper.toDtoFromEntity(insertionHistory)
             )
         );
-
         return WrapperListInsertionHistoriesResponseDto.builder()
             .totalElements(page.getTotalElements())
             .totalPages(page.getTotalPages())
@@ -56,13 +79,11 @@ public class InsertionHistoryService {
         userService.loadUserById(userId);
         Page<InsertionHistory> page = insertionHistoryRepository.findAllByUserId(userId, pageable);
         List<InsertionHistoryResponseDto> insertionHistoryResponseDtos = new ArrayList<>();
-
         page.forEach(insertionHistory ->
             insertionHistoryResponseDtos.add(
                 InsertionHistoryMapper.toDtoFromEntity(insertionHistory)
             )
         );
-
         return WrapperListInsertionHistoriesResponseDto.builder()
             .totalElements(page.getTotalElements())
             .totalPages(page.getTotalPages())
@@ -79,34 +100,22 @@ public class InsertionHistoryService {
             .endDate(null)
             .status(InsertionHistoryStatus.PENDING)
             .user(user)
+            .fileCommitted(false)
             .build();
         insertionHistoryRepository.save(insertionHistory);
         insertionHistoryRepository.flush();
         return insertionHistory.getId();
     }
 
-    @Transactional
-    public InsertionHistory updateStatusToSuccess(long insertionHistoryId, Long numberObjects) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void updateStatusToFailed(Long insertionHistoryId) {
         InsertionHistory insertionHistory = insertionHistoryTxService.findById(insertionHistoryId);
-        InsertionHistory updatedInsertionHistory = insertionHistory.toBuilder()
-            .endDate(LocalDateTime.now())
-            .status(InsertionHistoryStatus.SUCCESS)
-            .numberObjects(numberObjects)
-            .build();
-        insertionHistoryRepository.save(updatedInsertionHistory);
-        insertionHistoryRepository.flush();
-        return updatedInsertionHistory;
-    }
-
-    @Transactional
-    public InsertionHistory updateStatusToFailed(long insertionHistoryId) {
-        InsertionHistory insertionHistory = insertionHistoryTxService.findById(insertionHistoryId);
-        InsertionHistory updatedInsertionHistory = insertionHistory.toBuilder()
+        InsertionHistory updated = insertionHistory.toBuilder()
             .endDate(LocalDateTime.now())
             .status(InsertionHistoryStatus.FAILED)
+            .fileCommitted(false)
             .build();
-        insertionHistoryRepository.save(updatedInsertionHistory);
+        insertionHistoryRepository.save(updated);
         insertionHistoryRepository.flush();
-        return updatedInsertionHistory;
     }
 }

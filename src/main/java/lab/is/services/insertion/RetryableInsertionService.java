@@ -4,9 +4,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import lab.is.exceptions.CsvParserException;
 import org.springframework.stereotype.Service;
 
+import lab.is.exceptions.CsvParserException;
 import lab.is.exceptions.RetryInsertException;
 import lab.is.services.insertion.bloomfilter.BloomFilterManager;
 import lombok.RequiredArgsConstructor;
@@ -20,17 +20,17 @@ public class RetryableInsertionService {
     private final CsvInsertionService insertionService;
     private final BloomFilterManager bloomFilterManager;
 
-    public Long insertWithRetry(InputStream csvStream, long insertionHistoryId) {
+    public Long insertWithRetry(InputStream csvStream) {
         byte[] csvData;
         try {
             csvData = csvStream.readAllBytes();
         } catch (IOException e) {
-            throw new CsvParserException("ошибка с файлом при импорте", insertionHistoryId, 0L);
+            throw new CsvParserException("ошибка с файлом при импорте", 0L);
         }
         int attempt = 0;
         while (attempt < MAX_RETRIES) {
             try (InputStream freshStream = new ByteArrayInputStream(csvData)) {
-                return insertionService.insertCsv(freshStream, insertionHistoryId);
+                return insertionService.insertCsv(freshStream);
             } catch (RetryInsertException e) {
                 attempt++;
                 bloomFilterManager.rebuild();
@@ -41,7 +41,7 @@ public class RetryableInsertionService {
                     );
                 }
             } catch (IOException e) {
-                throw new CsvParserException("ошибка с файлом при импорте", insertionHistoryId, 0L);
+                throw new CsvParserException("ошибка с файлом при импорте", 0L);
             }
         }
         throw new RetryInsertException("импорт не удался", 0L);

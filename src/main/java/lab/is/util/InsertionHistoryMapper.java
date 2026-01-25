@@ -14,6 +14,8 @@ public class InsertionHistoryMapper {
             .status(entity.getStatus())
             .login(entity.getUser().getLogin())
             .numberObjects(entity.getNumberObjects())
+            .fileObjectKey(entity.getFileObjectKey())
+            .fileCommitted(entity.getFileCommitted())
             .build();
     }
 }

@@ -42,7 +42,7 @@ public class CsvInsertionService {
     private final String[] headers = InsertionHeaders.getHeaders();
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public Long insertCsv(InputStream csvStream, long insertionHistoryId) {
+    public Long insertCsv(InputStream csvStream) {
         CSVFormat format = CSVFormat.DEFAULT.builder()
             .setDelimiter(';')
             .setHeader(headers)
@@ -63,8 +63,7 @@ public class CsvInsertionService {
                 recordCount++;
                 MusicBand musicBand = csvParser.convertRecordToEntity(
                     csvRecord,
-                    csvRecord.getRecordNumber(),
-                    insertionHistoryId
+                    csvRecord.getRecordNumber()
                 );
                 String name = csvRecord.get(InsertionHeaders.NAME.getName());
                 if (batchNamesCache.contains(name)) {
@@ -87,9 +86,8 @@ public class CsvInsertionService {
             }
         } catch (DuplicateNameException e) {
             throw new CsvParserException(
-                    String.format("Импорт прерван на строке %s: %s", recordCount, e.getMessage()),
-                    insertionHistoryId,
-                    recordCount
+                String.format("Импорт прерван на строке %s: %s", recordCount, e.getMessage()),
+                recordCount
             );
         } catch (
             PersistenceException |
@@ -104,7 +102,7 @@ public class CsvInsertionService {
         ) {
             throw e;
         } catch (Exception e) {
-            throw new CsvParserException("Импорт прерван на строке " + recordCount, insertionHistoryId, recordCount);
+            throw new CsvParserException("Импорт прерван на строке " + recordCount, recordCount);
         }
         return recordCount;
     }
