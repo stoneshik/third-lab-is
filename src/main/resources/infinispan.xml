@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<infinispan
-    xmlns="urn:infinispan:config:15.0">
-
-    <cache-container statistics="true">
+<infinispan xmlns="urn:infinispan:config:15.0">
+    <jgroups>
+        <stack name="local">
+            <transport type="TCP"/>
+        </stack>
+    </jgroups>
+    <cache-container name="hibernate" statistics="true">
+        <transport stack="local"/>
         <!-- ===== ENTITIES ===== -->
         <local-cache name="album">
             <memory max-count="5000"/>
