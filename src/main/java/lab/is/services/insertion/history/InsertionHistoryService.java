@@ -1,5 +1,6 @@
 package lab.is.services.insertion.history;
 
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,7 @@ import lab.is.dto.responses.insertion.history.WrapperListInsertionHistoriesRespo
 import lab.is.repositories.InsertionHistoryRepository;
 import lab.is.security.bd.entities.User;
 import lab.is.security.services.UserService;
+import lab.is.services.importfile.MinioImportFileStorage;
 import lab.is.util.InsertionHistoryMapper;
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +28,7 @@ public class InsertionHistoryService {
     private final InsertionHistoryTxService insertionHistoryTxService;
     private final InsertionHistoryRepository insertionHistoryRepository;
     private final UserService userService;
+    private final MinioImportFileStorage fileStorage;
 
     @Transactional(readOnly = true)
     public InsertionHistory findById(long id) {
@@ -119,5 +122,11 @@ public class InsertionHistoryService {
             .build();
         insertionHistoryRepository.save(updated);
         insertionHistoryRepository.flush();
+    }
+
+    @Transactional
+    public InputStream download(Long insertionHistoryId) {
+        InsertionHistory insertionHistory = insertionHistoryTxService.findById(insertionHistoryId);
+        return fileStorage.download(insertionHistory.getFileObjectKey());
     }
 }

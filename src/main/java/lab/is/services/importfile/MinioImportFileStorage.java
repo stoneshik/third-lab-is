@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import io.minio.CopyObjectArgs;
 import io.minio.CopySource;
+import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
@@ -19,8 +20,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class MinioImportFileStorage implements ImportFileStorage {
-    private static final Logger logger = LoggerFactory.getLogger(ImportFileStorage.class);
-    private static final String BUCKET = "imports";
+    private static final Logger logger = LoggerFactory.getLogger(MinioImportFileStorage.class);
     private final MinioClient minioClient;
     private final MinioProperties properties;
 
@@ -30,7 +30,7 @@ public class MinioImportFileStorage implements ImportFileStorage {
         try {
             minioClient.putObject(
                 PutObjectArgs.builder()
-                    .bucket(BUCKET)
+                    .bucket(properties.getBucket())
                     .object(tempKey)
                     .stream(
                         data,
@@ -52,11 +52,11 @@ public class MinioImportFileStorage implements ImportFileStorage {
         try {
             minioClient.copyObject(
                 CopyObjectArgs.builder()
-                    .bucket(BUCKET)
+                    .bucket(properties.getBucket())
                     .object(finalKey)
                     .source(
                         CopySource.builder()
-                            .bucket(BUCKET)
+                            .bucket(properties.getBucket())
                             .object(objectKey)
                             .build()
                     )
@@ -64,7 +64,7 @@ public class MinioImportFileStorage implements ImportFileStorage {
             );
             minioClient.removeObject(
                 RemoveObjectArgs.builder()
-                    .bucket(BUCKET)
+                    .bucket(properties.getBucket())
                     .object(objectKey)
                     .build()
             );
@@ -78,12 +78,25 @@ public class MinioImportFileStorage implements ImportFileStorage {
         try {
             minioClient.removeObject(
                 RemoveObjectArgs.builder()
-                    .bucket(BUCKET)
+                    .bucket(properties.getBucket())
                     .object(objectKey)
                     .build()
             );
         } catch (Exception ignored) {
             logger.warn("ошибка во время rollback MinIO");
+        }
+    }
+
+    public InputStream download(String objectKey) {
+        try {
+            return minioClient.getObject(
+                GetObjectArgs.builder()
+                    .bucket(properties.getBucket())
+                    .object(objectKey)
+                    .build()
+            );
+        } catch (Exception e) {
+            throw new MinioException("Не удалось скачать файл");
         }
     }
 }

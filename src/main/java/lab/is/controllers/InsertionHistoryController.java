@@ -1,21 +1,27 @@
 package lab.is.controllers;
 
-import lab.is.exceptions.UserDoesNotHaveEnoughRightsException;
-import lab.is.security.bd.entities.RoleEnum;
-import lab.is.security.model.UserDetailsImpl;
+import java.io.InputStream;
+
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lab.is.dto.responses.insertion.history.WrapperListInsertionHistoriesResponseDto;
+import lab.is.exceptions.UserDoesNotHaveEnoughRightsException;
+import lab.is.security.bd.entities.RoleEnum;
+import lab.is.security.model.UserDetailsImpl;
 import lab.is.services.insertion.history.InsertionHistoryService;
 import lombok.RequiredArgsConstructor;
 
@@ -48,5 +54,13 @@ public class InsertionHistoryController {
         return ResponseEntity.ok(
             insertionHistoryService.findAllByUserId(pageable, userId)
         );
+    }
+
+    @GetMapping("/{insertionHistoryId}/file")
+    public ResponseEntity<Resource> download(@PathVariable long insertionHistoryId) {
+        InputStream inputStream = insertionHistoryService.download(insertionHistoryId);
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment")
+            .body(new InputStreamResource(inputStream));
     }
 }
