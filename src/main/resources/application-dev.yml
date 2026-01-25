@@ -24,18 +24,17 @@ spring:
     database-platform: "org.hibernate.dialect.PostgreSQLDialect"
     properties:
       hibernate:
-        jdbc.batch_size: 10000
-        order_inserts: true
-        order_updates: true
-        jdbc.batch_versioned_data: true
-        jdbc.fetch_size: 10000
+        '[jdbc.batch_size]': 10000
+        '[order_inserts]': true
+        '[order_updates]': true
+        '[jdbc.batch_versioned_data]': true
+        '[jdbc.fetch_size]': 10000
         # === НАСТРОЙКИ L2-КЭША INFINISPAN ===
         cache:
-          use_second_level_cache: true
-          use_query_cache: true
-          region:
-            factory_class: org.infinispan.hibernate.cache.v62.InfinispanRegionFactory
-        generate_statistics: true
+          '[use_second_level_cache]': true
+          '[use_query_cache]': true
+          '[region.factory_class]': "org.infinispan.hibernate.cache.v62.InfinispanRegionFactory"
+        '[generate_statistics]': true
       jakarta:
         persistence:
           sharedCache:
@@ -63,11 +62,11 @@ cache:
 logging:
   level:
     # Отключаем ненужные логи
-    org.hibernate.cache: INFO
-    org.infinispan: WARN
-    org.hibernate.engine.internal.StatisticalLoggingSessionEventListener: OFF
-    org.hibernate.stat.internal.StatisticalLoggingSessionEventListener: OFF
-    i.StatisticalLoggingSessionEventListener: OFF
+    '[org.hibernate.cache]': INFO
+    '[org.infinispan]': WARN
+    '[org.hibernate.engine.internal.StatisticalLoggingSessionEventListener]': OFF
+    '[org.hibernate.stat.internal.StatisticalLoggingSessionEventListener]': OFF
+    '[i.StatisticalLoggingSessionEventListener]': OFF
     # Включаем логи для отладки
-    lab.is.aspects: INFO
-    lab.is.services.CacheStatisticsService: INFO
+    '[lab.is.aspects]': INFO
+    '[lab.is.services.CacheStatisticsService]': INFO

@@ -77,7 +77,6 @@ public class L2CacheStatisticsAspect {
                 """
                 [L2 CACHE ACTIVITY]
                 Repository interface : {}
-                Target proxy class   : {}
                 Method               : {}({})
                 Entity cache:
                   hits   : +{}
