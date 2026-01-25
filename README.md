@@ -1,6 +1,6 @@
 # Информационные системы
 
-## Лабораторная работа № 2
+## Лабораторная работа № 3
 
 Для запуска тестов нужно задать значение переменной окружения `SPRING_PROFILES_ACTIVE` равное `test` - в этом профиле используется БД поднимаемая `testcontainers`
 
@@ -9,22 +9,6 @@
 Файл `.env` должен находится в директории `resources`
 
 Локальный файл .env, также есть файл .env.example
-
-```
-## Spring profile settings
-SPRING_PROFILES_ACTIVE=dev
-
-## Is service settings
-IS_SERVICE_PORT=8080
-IS_SERVICE_BD_USERNAME=postgres
-IS_SERVICE_BD_PASSWORD=admin
-IS_SERVICE_BD_URL=jdbc:postgresql://localhost:5432/is_service
-
-## Token settings
-TOKEN_SECRET_KEY=a6c79a27049109e472b246b5dfbe08aedff1e9e2259597e54032dbad4958d4ad
-TOKEN_EXPIRE_TIME=3600000
-TOKEN_REFRESH_TIME=86400000
-```
 
 Подключение к серверу:<br>
 `ssh s33xxxx@se.ifmo.ru -p 2222`
@@ -38,6 +22,22 @@ Url подключения к БД<br>
 Сбор jar файла с пропуском тестов<br>
 `mvn package -DskipTests`
 
-Ссылка на фронтенд - https://github.com/stoneshik/first-lab-is-frontend
+
+Поднятие MinIO<br>
+`docker compose up -d`
+
+Остановка MinIO<br>
+`docker compose down`
+
+`minio-data` — именованный volume Docker
+Физически лежит в:<br>
+`/var/lib/docker/volumes/minio-data/_data`
+
+Web UI MinIO: http://localhost:9001<br>
+login: minio<br>
+password: minio123<br>
+bucket: imports
+
+Ссылка на фронтенд - https://github.com/stoneshik/third-lab-is-frontend
 
 Писалось все по TDD, можно глянуть в гите (*≧ω≦*)
