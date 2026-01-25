@@ -34,34 +34,34 @@ public class L2CacheStatisticsAspect {
         if (!stats.isStatisticsEnabled()) {
             return proceedingJoinPoint.proceed();
         }
-        // ===== BEFORE =====
-        long l2HitsBefore    = stats.getSecondLevelCacheHitCount();
-        long l2MissesBefore  = stats.getSecondLevelCacheMissCount();
-        long l2PutsBefore    = stats.getSecondLevelCachePutCount();
+        // BEFORE
+        long l2HitsBefore = stats.getSecondLevelCacheHitCount();
+        long l2MissesBefore = stats.getSecondLevelCacheMissCount();
+        long l2PutsBefore = stats.getSecondLevelCachePutCount();
 
-        long qHitsBefore     = stats.getQueryCacheHitCount();
-        long qMissesBefore   = stats.getQueryCacheMissCount();
-        long qPutsBefore     = stats.getQueryCachePutCount();
+        long qHitsBefore = stats.getQueryCacheHitCount();
+        long qMissesBefore = stats.getQueryCacheMissCount();
+        long qPutsBefore = stats.getQueryCachePutCount();
 
         Object result = proceedingJoinPoint.proceed();
 
-        // ===== AFTER =====
-        long l2HitsAfter     = stats.getSecondLevelCacheHitCount();
-        long l2MissesAfter   = stats.getSecondLevelCacheMissCount();
-        long l2PutsAfter     = stats.getSecondLevelCachePutCount();
+        // AFTER
+        long l2HitsAfter = stats.getSecondLevelCacheHitCount();
+        long l2MissesAfter = stats.getSecondLevelCacheMissCount();
+        long l2PutsAfter = stats.getSecondLevelCachePutCount();
 
-        long qHitsAfter      = stats.getQueryCacheHitCount();
-        long qMissesAfter    = stats.getQueryCacheMissCount();
-        long qPutsAfter      = stats.getQueryCachePutCount();
+        long qHitsAfter = stats.getQueryCacheHitCount();
+        long qMissesAfter = stats.getQueryCacheMissCount();
+        long qPutsAfter = stats.getQueryCachePutCount();
 
-        // ===== DELTAS =====
-        long dHits    = l2HitsAfter   - l2HitsBefore;
-        long dMisses  = l2MissesAfter - l2MissesBefore;
-        long dPuts    = l2PutsAfter   - l2PutsBefore;
+        // DELTAS
+        long dHits = l2HitsAfter - l2HitsBefore;
+        long dMisses = l2MissesAfter - l2MissesBefore;
+        long dPuts = l2PutsAfter - l2PutsBefore;
 
-        long dQHits   = qHitsAfter    - qHitsBefore;
-        long dQMisses = qMissesAfter  - qMissesBefore;
-        long dQPuts   = qPutsAfter    - qPutsBefore;
+        long dQHits = qHitsAfter - qHitsBefore;
+        long dQMisses = qMissesAfter - qMissesBefore;
+        long dQPuts = qPutsAfter - qPutsBefore;
 
         if (
             dHits != 0 ||
