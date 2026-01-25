@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import lab.is.services.insertion.ImportTransactionCoordinator;
+import lab.is.services.insertion.coordinator.ImportTransactionCoordinatorWrapper;
 import lab.is.services.insertion.history.InsertionHistoryService;
 import lombok.RequiredArgsConstructor;
 
@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/v1/insertion")
 @RequiredArgsConstructor
 public class InsertionControllerForTest {
-    private final ImportTransactionCoordinator coordinator;
+    private final ImportTransactionCoordinatorWrapper coordinatorWrapper;
     private final InsertionHistoryService insertionHistoryService;
 
     @PostMapping("/csv")
@@ -26,7 +26,7 @@ public class InsertionControllerForTest {
         @RequestParam MultipartFile file
     ) {
         long insertionHistoryId = insertionHistoryService.create(userId);
-        coordinator.execute(file, insertionHistoryId);
+        coordinatorWrapper.execute(file, insertionHistoryId);
         return ResponseEntity.ok().build();
     }
 }

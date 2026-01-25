@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import lab.is.exceptions.UserDoesNotHaveEnoughRightsException;
 import lab.is.security.model.UserDetailsImpl;
-import lab.is.services.insertion.ImportTransactionCoordinator;
+import lab.is.services.insertion.coordinator.ImportTransactionCoordinatorWrapper;
 import lab.is.services.insertion.history.InsertionHistoryService;
 import lombok.RequiredArgsConstructor;
 
@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/v1/insertion")
 @RequiredArgsConstructor
 public class InsertionController {
-    private final ImportTransactionCoordinator coordinator;
+    private final ImportTransactionCoordinatorWrapper coordinatorWrapper;
     private final InsertionHistoryService insertionHistoryService;
 
     @PostMapping("/csv")
@@ -34,7 +34,7 @@ public class InsertionController {
             throw new UserDoesNotHaveEnoughRightsException("у пользователя недостаточно прав");
         }
         long insertionHistoryId = insertionHistoryService.create(userId);
-        coordinator.execute(file, insertionHistoryId);
+        coordinatorWrapper.execute(file, insertionHistoryId);
         return ResponseEntity.ok().build();
     }
 }

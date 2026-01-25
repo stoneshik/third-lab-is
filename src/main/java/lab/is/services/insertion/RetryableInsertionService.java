@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import lab.is.exceptions.CsvParserException;
 import lab.is.exceptions.RetryInsertException;
@@ -20,6 +22,7 @@ public class RetryableInsertionService {
     private final CsvInsertionService insertionService;
     private final BloomFilterManager bloomFilterManager;
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public Long insertWithRetry(InputStream csvStream) {
         byte[] csvData;
         try {

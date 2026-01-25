@@ -46,10 +46,12 @@ public class InsertionHistoryService {
     @Transactional
     public void markFileCommittedAndStatusToSuccess(Long insertionHistoryId, Long numberObjects) {
         InsertionHistory insertionHistory = insertionHistoryTxService.findById(insertionHistoryId);
+        String committedKey = insertionHistory.getFileObjectKey().replace("tmp/", "committed/");
         InsertionHistory updated = insertionHistory.toBuilder()
             .endDate(LocalDateTime.now())
             .status(InsertionHistoryStatus.SUCCESS)
             .numberObjects(numberObjects)
+            .fileObjectKey(committedKey)
             .fileCommitted(true)
             .build();
         insertionHistoryRepository.save(updated);
