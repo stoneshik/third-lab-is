@@ -1,6 +1,5 @@
 package lab.is.services.insertion.history;
 
-import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -125,8 +124,15 @@ public class InsertionHistoryService {
     }
 
     @Transactional
-    public InputStream download(Long insertionHistoryId) {
+    public DownloadFile download(Long insertionHistoryId) {
         InsertionHistory insertionHistory = insertionHistoryTxService.findById(insertionHistoryId);
-        return fileStorage.download(insertionHistory.getFileObjectKey());
+        String filename = insertionHistory.getFileObjectKey()
+            .substring(insertionHistory.getFileObjectKey().lastIndexOf('/') + 1);
+        return DownloadFile.builder()
+            .name(filename)
+            .inputStream(
+                fileStorage.download(insertionHistory.getFileObjectKey())
+            )
+            .build();
     }
 }

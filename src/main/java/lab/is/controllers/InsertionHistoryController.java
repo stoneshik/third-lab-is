@@ -1,7 +1,5 @@
 package lab.is.controllers;
 
-import java.io.InputStream;
-
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -22,6 +20,7 @@ import lab.is.dto.responses.insertion.history.WrapperListInsertionHistoriesRespo
 import lab.is.exceptions.UserDoesNotHaveEnoughRightsException;
 import lab.is.security.bd.entities.RoleEnum;
 import lab.is.security.model.UserDetailsImpl;
+import lab.is.services.insertion.history.DownloadFile;
 import lab.is.services.insertion.history.InsertionHistoryService;
 import lombok.RequiredArgsConstructor;
 
@@ -58,9 +57,12 @@ public class InsertionHistoryController {
 
     @GetMapping("/{insertionHistoryId}/file")
     public ResponseEntity<Resource> download(@PathVariable long insertionHistoryId) {
-        InputStream inputStream = insertionHistoryService.download(insertionHistoryId);
+        DownloadFile downloadFile = insertionHistoryService.download(insertionHistoryId);
         return ResponseEntity.ok()
-            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment")
-            .body(new InputStreamResource(inputStream));
+            .header(
+                HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"" + downloadFile.getName() + "\""
+            )
+            .body(new InputStreamResource(downloadFile.getInputStream()));
     }
 }
