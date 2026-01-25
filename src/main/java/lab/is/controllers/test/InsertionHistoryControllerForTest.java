@@ -46,7 +46,7 @@ public class InsertionHistoryControllerForTest {
         @RequestParam(required = false) Long userId,
         @PathVariable Long insertionHistoryId
     ) {
-        return download(insertionHistoryId, userId);
+        return download(insertionHistoryId, null);
     }
 
     public ResponseEntity<Resource> download(Long insertionHistoryId, Long userId) {

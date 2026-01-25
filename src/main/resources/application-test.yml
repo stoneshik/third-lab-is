@@ -61,6 +61,14 @@ cache:
   statistics:
     enabled: true  # Включает аспект
 
+minio:
+  endpoint: http://localhost:9000
+  access-key: minio
+  secret-key: minio123
+  bucket: imports
+  upload:
+    part-size: 250MB
+
 logging:
   level:
     # Отключаем ненужные логи

@@ -7,7 +7,6 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import lab.is.bd.entities.InsertionHistory;
@@ -112,7 +111,7 @@ public class InsertionHistoryService {
         return insertionHistory.getId();
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void updateStatusToFailed(Long insertionHistoryId) {
         InsertionHistory insertionHistory = insertionHistoryTxService.findById(insertionHistoryId);
         InsertionHistory updated = insertionHistory.toBuilder()
@@ -128,7 +127,7 @@ public class InsertionHistoryService {
     public DownloadFile download(Long insertionHistoryId, Long userIdFromRequest) {
         InsertionHistory insertionHistory = insertionHistoryTxService.findById(insertionHistoryId);
         Long userId = insertionHistory.getUser().getId();
-        if (userId != null && !userId.equals(userIdFromRequest)) {
+        if (userIdFromRequest != null && !userId.equals(userIdFromRequest)) {
             throw new UserDoesNotHaveEnoughRightsException("у пользователя недостаточно прав");
         }
         String filename = insertionHistory.getFileObjectKey()

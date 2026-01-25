@@ -115,11 +115,11 @@ abstract class SpringBootApplicationTest {
         entityManager.persist(user3);
 
         InsertionHistory insertionHistory1 = InsertionHistory.builder().endDate(LocalDateTime.now())
-            .status(InsertionHistoryStatus.SUCCESS).user(user1).numberObjects(3L).build();
+            .status(InsertionHistoryStatus.SUCCESS).user(user1).numberObjects(3L).fileCommitted(true).build();
         InsertionHistory insertionHistory2 = InsertionHistory.builder().endDate(LocalDateTime.now())
-            .status(InsertionHistoryStatus.FAILED).user(admin).build();
+            .status(InsertionHistoryStatus.FAILED).user(admin).fileCommitted(false).build();
         InsertionHistory insertionHistory3 = InsertionHistory.builder()
-            .status(InsertionHistoryStatus.PENDING).user(user1).build();
+            .status(InsertionHistoryStatus.PENDING).user(user1).fileCommitted(false).build();
         entityManager.persist(insertionHistory1);
         entityManager.persist(insertionHistory2);
         entityManager.persist(insertionHistory3);

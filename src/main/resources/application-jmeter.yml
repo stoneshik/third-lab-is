@@ -20,7 +20,7 @@ spring:
       leak-detection-threshold: 60000 # Порог для обнаружения утечек соединений (мс)
   jpa:
     generate-ddl: true
-    hibernate.ddl-auto: "update"
+    hibernate.ddl-auto: "create"
     database-platform: "org.hibernate.dialect.PostgreSQLDialect"
     properties:
       hibernate:
@@ -60,6 +60,14 @@ batch-properties:
 cache:
   statistics:
     enabled: true  # Включает аспект
+
+minio:
+  endpoint: http://localhost:9000
+  access-key: minio
+  secret-key: minio123
+  bucket: imports
+  upload:
+    part-size: 250MB
 
 logging:
   level:
