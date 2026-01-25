@@ -9,24 +9,38 @@ spring:
       username: ${CONTAINER.USERNAME}
       password: ${CONTAINER.PASSWORD}
       url: ${CONTAINER.URL}
+    hikari:
+      connection-timeout: 30000       # Максимальное время ожидания соединения из пула (мс)
+      maximum-pool-size: 20           # Максимальное количество соединений в пуле
+      minimum-idle: 5                 # Минимальное количество idle соединений
+      idle-timeout: 600000            # Время простоя соединения до закрытия (мс)
+      max-lifetime: 1800000           # Максимальное время жизни соединения (мс)
+      connection-test-query: SELECT 1 # Запрос для проверки работоспособности соединения
+      pool-name: MyHikariPool         # Имя пула для мониторинга
+      leak-detection-threshold: 60000 # Порог для обнаружения утечек соединений (мс)
   jpa:
     generate-ddl: true
     hibernate.ddl-auto: "update"
     database-platform: "org.hibernate.dialect.PostgreSQLDialect"
     properties:
       hibernate:
-        '[jdbc.batch_size]': 100
+        '[jdbc.batch_size]': 10000
         '[order_inserts]': true
         '[order_updates]': true
         '[jdbc.batch_versioned_data]': true
-        # Оптимизация для массовой вставки
-        '[cache.use_second_level_cache]': false
-        '[cache.use_query_cache]': false
-        '[jdbc.fetch_size]': 1000
+        '[jdbc.fetch_size]': 10000
+        # === НАСТРОЙКИ L2-КЭША INFINISPAN ===
+        cache:
+          '[use_second_level_cache]': true
+          '[use_query_cache]': true
+          '[region.factory_class]': "org.infinispan.hibernate.cache.v62.InfinispanRegionFactory"
+        '[generate_statistics]': true
       jakarta:
         persistence:
           validation:
             mode: "auto"
+          sharedCache:
+            mode: ENABLE_SELECTIVE  # Только аннотированные @Cacheable сущности
   servlet:
     multipart:
       max-file-size: 250MB
@@ -42,3 +56,19 @@ bloom-filter:
 batch-properties:
   batch-size: 10000
   max-record-number_for_rebuild_bloom_filter: 1000
+
+cache:
+  statistics:
+    enabled: true  # Включает аспект
+
+logging:
+  level:
+    # Отключаем ненужные логи
+    '[org.hibernate.cache]': INFO
+    '[org.infinispan]': WARN
+    '[org.hibernate.engine.internal.StatisticalLoggingSessionEventListener]': OFF
+    '[org.hibernate.stat.internal.StatisticalLoggingSessionEventListener]': OFF
+    '[i.StatisticalLoggingSessionEventListener]': OFF
+    # Включаем логи для отладки
+    '[lab.is.aspects]': INFO
+    '[lab.is.services.CacheStatisticsService]': INFO

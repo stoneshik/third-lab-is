@@ -37,6 +37,8 @@ spring:
         '[generate_statistics]': true
       jakarta:
         persistence:
+          validation:
+            mode: "auto"
           sharedCache:
             mode: ENABLE_SELECTIVE  # Только аннотированные @Cacheable сущности
   servlet:
