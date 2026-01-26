@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import lab.is.bd.entities.InsertionHistory;
@@ -34,7 +35,7 @@ public class InsertionHistoryService {
         return insertionHistoryTxService.findById(id);
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void attachFile(Long insertionHistoryId, String objectKey) {
         InsertionHistory insertionHistory = insertionHistoryTxService.findById(insertionHistoryId);
         InsertionHistory updated = insertionHistory.toBuilder()
@@ -45,7 +46,7 @@ public class InsertionHistoryService {
         insertionHistoryRepository.flush();
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void markFileCommittedAndStatusToSuccess(Long insertionHistoryId, Long numberObjects) {
         InsertionHistory insertionHistory = insertionHistoryTxService.findById(insertionHistoryId);
         String committedKey = insertionHistory.getFileObjectKey().replace("tmp/", "committed/");
@@ -97,7 +98,7 @@ public class InsertionHistoryService {
             .build();
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public long create(Long userId) {
         User user = userService.loadUserById(userId);
         InsertionHistory insertionHistory = InsertionHistory.builder()
@@ -111,19 +112,21 @@ public class InsertionHistoryService {
         return insertionHistory.getId();
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void updateStatusToFailed(Long insertionHistoryId) {
         InsertionHistory insertionHistory = insertionHistoryTxService.findById(insertionHistoryId);
         InsertionHistory updated = insertionHistory.toBuilder()
             .endDate(LocalDateTime.now())
             .status(InsertionHistoryStatus.FAILED)
+            .numberObjects(null)
+            .fileObjectKey(null)
             .fileCommitted(false)
             .build();
         insertionHistoryRepository.save(updated);
         insertionHistoryRepository.flush();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public DownloadFile download(Long insertionHistoryId, Long userIdFromRequest) {
         InsertionHistory insertionHistory = insertionHistoryTxService.findById(insertionHistoryId);
         Long userId = insertionHistory.getUser().getId();
