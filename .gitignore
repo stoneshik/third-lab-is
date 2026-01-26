@@ -6,6 +6,8 @@ target/
 **.docx**
 **.env
 megalarge*.csv
+/minio-data
+/postgres-data
 
 ### STS ###
 .apt_generated

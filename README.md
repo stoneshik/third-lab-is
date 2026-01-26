@@ -19,19 +19,27 @@
 Url подключения к БД<br>
 `jdbc:postgresql://localhost:5432/studs`
 
-Сбор jar файла с пропуском тестов<br>
-`mvn package -DskipTests`
+Сначала собираем jar файл при помощи скрипта<br>
+`bash build.sh`
 
+Затем поднимаем контейнеры<br>
+`docker-compose up --build`
 
-Поднятие MinIO<br>
-`docker compose up -d`
-
-Остановка MinIO<br>
+Остановка всех контейнеров<br>
 `docker compose down`
 
-`minio-data` — именованный volume Docker
-Физически лежит в:<br>
-`/var/lib/docker/volumes/minio-data/_data`
+Посмотреть запущенные сервисы<br>
+`docker-compose ps`
+
+Остановить конкретный сервис<br>
+`docker-compose stop postgres`<br>
+`docker-compose stop minio`<br>
+`docker-compose stop app`
+
+Запустить конкретный сервис<br>
+`docker-compose start postgres`<br>
+`docker-compose start minio`<br>
+`docker-compose start app`
 
 Web UI MinIO: http://localhost:9001<br>
 login: minio<br>
