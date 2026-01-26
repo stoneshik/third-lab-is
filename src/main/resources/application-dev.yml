@@ -69,6 +69,12 @@ minio:
   upload:
     part-size: 250MB
 
+cleanup:
+  ttl:
+    tmp: "PT30M"
+    pending: "PT1H"
+  delay-string: "PT30M"
+
 logging:
   level:
     # Отключаем ненужные логи

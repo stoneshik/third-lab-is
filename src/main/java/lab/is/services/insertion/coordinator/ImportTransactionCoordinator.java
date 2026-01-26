@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import lab.is.services.importfile.MinioImportFileStorage;
+import lab.is.services.importfile.MinioImportFileService;
 import lab.is.services.insertion.RetryableInsertionService;
 import lab.is.services.insertion.history.InsertionHistoryService;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ImportTransactionCoordinator {
-    private final MinioImportFileStorage fileStorage;
+    private final MinioImportFileService importFileService;
     private final RetryableInsertionService insertionService;
     private final InsertionHistoryService insertionHistoryService;
 
@@ -25,7 +25,7 @@ public class ImportTransactionCoordinator {
         String objectKey = null;
         try {
             // PHASE 1 — prepare
-            objectKey = fileStorage.prepare(
+            objectKey = importFileService.prepare(
                 file.getInputStream(),
                 file.getOriginalFilename()
             );
@@ -35,7 +35,7 @@ public class ImportTransactionCoordinator {
                 file.getInputStream()
             );
             // COMMIT
-            fileStorage.commit(objectKey);
+            importFileService.commit(objectKey);
             insertionHistoryService.markFileCommittedAndStatusToSuccess(
                 insertionHistoryId,
                 numberObjects
@@ -48,7 +48,7 @@ public class ImportTransactionCoordinator {
 
     public void rollback(String objectKey) {
         if (objectKey != null) {
-            fileStorage.rollback(objectKey);
+            importFileService.rollback(objectKey);
         }
     }
 }

@@ -63,5 +63,20 @@
     "name": "minio.upload.part-size",
     "type": "java.lang.String",
     "description": "A description for 'minio.upload.part-size'"
+  },
+  {
+    "name": "cleanup.ttl.tmp",
+    "type": "java.lang.String",
+    "description": "A description for 'cleanup.ttl.tmp'"
+  },
+  {
+    "name": "cleanup.ttl.pending",
+    "type": "java.lang.String",
+    "description": "A description for 'cleanup.ttl.pending'"
+  },
+  {
+    "name": "cleanup.delay-string",
+    "type": "java.lang.String",
+    "description": "A description for 'cleanup.delay-string'"
   }
 ]}

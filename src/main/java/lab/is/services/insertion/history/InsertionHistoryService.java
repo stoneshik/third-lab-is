@@ -18,7 +18,7 @@ import lab.is.exceptions.UserDoesNotHaveEnoughRightsException;
 import lab.is.repositories.InsertionHistoryRepository;
 import lab.is.security.bd.entities.User;
 import lab.is.security.services.UserService;
-import lab.is.services.importfile.MinioImportFileStorage;
+import lab.is.services.importfile.MinioImportFileService;
 import lab.is.util.InsertionHistoryMapper;
 import lombok.RequiredArgsConstructor;
 
@@ -28,7 +28,7 @@ public class InsertionHistoryService {
     private final InsertionHistoryTxService insertionHistoryTxService;
     private final InsertionHistoryRepository insertionHistoryRepository;
     private final UserService userService;
-    private final MinioImportFileStorage fileStorage;
+    private final MinioImportFileService importFileService;
 
     @Transactional(readOnly = true)
     public InsertionHistory findById(long id) {
@@ -138,7 +138,7 @@ public class InsertionHistoryService {
         return DownloadFile.builder()
             .name(filename)
             .inputStream(
-                fileStorage.download(insertionHistory.getFileObjectKey())
+                importFileService.download(insertionHistory.getFileObjectKey())
             )
             .build();
     }
