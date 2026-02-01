@@ -55,7 +55,7 @@ public class FileCleanupJob {
     }
 
     /**
-     * 2. PENDING → FAILED если завис
+     * 2. PENDING -> FAILED если завис
      */
     public void fixExpiredPending() {
         Duration pendingTtl = properties.getTtl().getPending();
@@ -63,7 +63,7 @@ public class FileCleanupJob {
         List<InsertionHistory> expired = insertionHistoryRepository.findExpiredPending(threshold);
         for (InsertionHistory insertionHistory: expired) {
             insertionHistoryService.updateStatusToFailed(insertionHistory.getId());
-            log.warn("InsertionHistory {} moved PENDING → FAILED (timeout)", insertionHistory.getId());
+            log.warn("InsertionHistory {} moved PENDING -> FAILED (timeout)", insertionHistory.getId());
         }
     }
 
@@ -85,7 +85,7 @@ public class FileCleanupJob {
     }
 
     /**
-     * 4. Удаление любых orphan-файлов (включая committed)
+     * 4. Удаление committed orphan-файлов
      */
     public void cleanupOrphanFiles() {
         Set<String> usedKeys = insertionHistoryRepository.findAllUsedFileObjectKeys();

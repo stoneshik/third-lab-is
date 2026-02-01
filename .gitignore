@@ -8,6 +8,7 @@ target/
 megalarge*.csv
 /minio-data
 /postgres-data
+large.csv
 
 ### STS ###
 .apt_generated

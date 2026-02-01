@@ -71,9 +71,9 @@ minio:
 
 cleanup:
   ttl:
-    tmp: "PT30M"
-    pending: "PT1H"
-  delay-string: "PT30M"
+    tmp: "PT1M"
+    pending: "PT1M"
+  delay-string: "PT2M"
 
 logging:
   level:
