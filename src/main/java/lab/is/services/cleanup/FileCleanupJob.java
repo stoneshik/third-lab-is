@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import lab.is.bd.entities.InsertionHistory;
@@ -28,7 +29,6 @@ public class FileCleanupJob {
     private final InsertionHistoryService insertionHistoryService;
 
     @Scheduled(fixedDelayString = "#{@cleanupProperties.delayString}")
-    @Transactional
     public void cleanupAndFixConsistency() {
         cleanupTmpFiles();
         fixExpiredPending();
@@ -39,12 +39,13 @@ public class FileCleanupJob {
     /**
      * 1. Чистка tmp-файлов
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void cleanupTmpFiles() {
         Duration tmpTtl = properties.getTtl().getTmp();
         Instant threshold = Instant.now().minus(tmpTtl);
         List<String> tmpFiles = importFileService.listObjects("tmp/");
         Set<String> usedKeys = insertionHistoryRepository.findAllTmpFileObjectKeys();
-        for (String objectKey : tmpFiles) {
+        for (String objectKey: tmpFiles) {
             boolean usedInDb = usedKeys.contains(objectKey);
             Instant createdAt = importFileService.getObjectCreationTime(objectKey);
             if (!usedInDb || createdAt.isBefore(threshold)) {
@@ -57,6 +58,7 @@ public class FileCleanupJob {
     /**
      * 2. PENDING -> FAILED если завис
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void fixExpiredPending() {
         Duration pendingTtl = properties.getTtl().getPending();
         LocalDateTime threshold = LocalDateTime.now().minus(pendingTtl);
@@ -70,13 +72,14 @@ public class FileCleanupJob {
     /**
      * 3. SUCCESS без файла -> FAILED
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void fixBrokenSuccess() {
         List<InsertionHistory> histories = insertionHistoryRepository.findSuccessWithCommittedFile();
         for (InsertionHistory insertionHistory: histories) {
             String fileObjectKey = insertionHistory.getFileObjectKey();
             if (fileObjectKey == null || !importFileService.exists(fileObjectKey)) {
                 insertionHistoryService.updateStatusToFailed(insertionHistory.getId());
-                log.error(
+                log.warn(
                     "InsertionHistory {} SUCCESS but file missing -> FAILED",
                     insertionHistory.getId()
                 );
@@ -87,6 +90,7 @@ public class FileCleanupJob {
     /**
      * 4. Удаление committed orphan-файлов
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void cleanupOrphanFiles() {
         Set<String> usedKeys = insertionHistoryRepository.findAllUsedFileObjectKeys();
         cleanupPrefixOrphanFiles("committed/", usedKeys);
@@ -94,7 +98,7 @@ public class FileCleanupJob {
 
     public void cleanupPrefixOrphanFiles(String prefix, Set<String> usedKeys) {
         List<String> files = importFileService.listObjects(prefix);
-        for (String objectKey : files) {
+        for (String objectKey: files) {
             if (!usedKeys.contains(objectKey)) {
                 importFileService.delete(objectKey);
                 log.warn("Deleted orphan file {}", objectKey);
