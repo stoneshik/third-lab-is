@@ -20,26 +20,46 @@ Url подключения к БД<br>
 `jdbc:postgresql://localhost:5432/studs`
 
 Сначала собираем jar файл при помощи скрипта<br>
-`bash build.sh`
+```
+bash build.sh
+```
 
 Затем поднимаем контейнеры<br>
-`docker-compose up --build`
+```
+docker-compose up --build
+```
 
 Остановка всех контейнеров<br>
-`docker compose down`
+```
+docker-compose down
+```
 
 Посмотреть запущенные сервисы<br>
-`docker-compose ps`
+```
+docker-compose ps
+```
 
-Остановить конкретный сервис<br>
-`docker-compose stop postgres`<br>
-`docker-compose stop minio`<br>
-`docker-compose stop app`
+Остановить конкретный сервис
+```
+docker-compose stop postgres
+```
+```
+docker-compose stop minio
+```
+```
+docker-compose stop app
+```
 
-Запустить конкретный сервис<br>
-`docker-compose start postgres`<br>
-`docker-compose start minio`<br>
-`docker-compose start app`
+Запустить конкретный сервис
+```
+docker-compose start postgres
+```
+```
+docker-compose start minio
+```
+```
+docker-compose start app
+```
 
 Web UI MinIO: http://localhost:9001<br>
 login: minio<br>
