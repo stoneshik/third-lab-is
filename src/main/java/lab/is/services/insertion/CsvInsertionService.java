@@ -29,7 +29,9 @@ import lab.is.exceptions.RetryInsertException;
 import lab.is.services.insertion.bloomfilter.BloomFilterManager;
 import lab.is.services.musicband.MusicBandNameUniquenessValidator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CsvInsertionService {
@@ -61,20 +63,16 @@ public class CsvInsertionService {
             ) {
             for (CSVRecord csvRecord: parser) {
                 recordCount++;
-                MusicBand musicBand = csvParser.convertRecordToEntity(
-                    csvRecord,
-                    csvRecord.getRecordNumber()
-                );
-                String name = csvRecord.get(InsertionHeaders.NAME.getName());
-                if (batchNamesCache.contains(name)) {
-                    throw new DuplicateNameException(
-                        String.format("Дубликат имени %s", name)
+                try {
+                    readAndSaveEntity(
+                        batchNamesCache,
+                        batch,
+                        csvRecord
                     );
+                } catch (Exception e) {
+                    log.warn(String.format("Ошибка импорта строки %s: %s, строка пропущена", recordCount, e.getMessage()));
+                    recordCount--;
                 }
-                musicBandNameUniquenessValidator.validate(name);
-                bloomFilterManager.put(name);
-                batchNamesCache.add(name);
-                batch.add(musicBand);
                 if (batch.size() >= properties.getBatchSize()) {
                     flushBatch(batch);
                     batch.clear();
@@ -92,7 +90,8 @@ public class CsvInsertionService {
         } catch (
             PersistenceException |
             DataAccessException |
-            TransactionException e) {
+            TransactionException e
+        ) {
             throw new RetryInsertException(
                 String.format("Импорт прерван на строке %s: объект был изменен другим пользователем", recordCount),
                 recordCount
@@ -104,6 +103,9 @@ public class CsvInsertionService {
         } catch (Exception e) {
             throw new CsvParserException("Импорт прерван на строке " + recordCount, recordCount);
         }
+        if (recordCount <= 0) {
+            throw new CsvParserException("Не импортировано ни одной строки", recordCount);
+        }
         return recordCount;
     }
 
@@ -113,5 +115,26 @@ public class CsvInsertionService {
         }
         entityManager.flush();
         entityManager.clear();
+    }
+
+    private void readAndSaveEntity(
+        Set<String> batchNamesCache,
+        List<MusicBand> batch,
+        CSVRecord csvRecord
+    ) {
+        MusicBand musicBand = csvParser.convertRecordToEntity(
+            csvRecord,
+            csvRecord.getRecordNumber()
+        );
+        String name = csvRecord.get(InsertionHeaders.NAME.getName());
+        if (batchNamesCache.contains(name)) {
+            throw new DuplicateNameException(
+                String.format("Дубликат имени %s", name)
+            );
+        }
+        musicBandNameUniquenessValidator.validate(name);
+        bloomFilterManager.put(name);
+        batchNamesCache.add(name);
+        batch.add(musicBand);
     }
 }
